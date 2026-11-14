@@ -2,9 +2,26 @@
 <html>
 <head>
   <title>Predicting Car Fuel Efficiency</title>
+  <style>
+    body { max-width: 800px; margin: auto; padding: 20px; font-family: sans-serif; line-height: 1.6; }
+  </style>
 </head>
 <body>
   <h1>Predicting Car Fuel Efficiency from Design Specifications</h1>
   <p>ES 335 project by Miriyala Sai Priya</p>
+
+  <h2>1. The question</h2>
+  <p>Can a car's fuel efficiency (mpg) be predicted from its design specifications alone (cylinders, displacement, horsepower, weight, acceleration, model year and origin), and which specifications matter most for the prediction?</p>
+  <p>The data covers cars from 1970 to 1982, so I only claim that the model describes this period, not modern cars. I do not claim that the specifications cause mpg, only that they predict it.</p>
+
+  <h2>2. The data</h2>
+  <p>Source: the UCI Machine Learning Repository, Auto MPG dataset. One row is one car model.</p>
+  <ul>
+    <li>398 cars in total</li>
+    <li>Target: mpg</li>
+    <li>7 input variables: cylinders, displacement, horsepower, weight, acceleration, model year, origin (1 = USA, 2 = Europe, 3 = Japan)</li>
+    <li>The car name column was dropped because it is only an identifier</li>
+    <li>Horsepower has 6 missing values</li>
+  </ul>
 </body>
 </html>
