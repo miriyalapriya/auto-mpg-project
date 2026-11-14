@@ -175,7 +175,33 @@
       document.getElementById(id).addEventListener("change", update);
     });
   </script> 
-   
+  <h2>8. Which specifications matter most?</h2>
+  <p>I looked at this in two ways. First, the ridge coefficients on standardized inputs (these act on log(mpg), so a bigger absolute value means a bigger push). Second, I removed one specification at a time, refitted the model, and measured how much the cross-validation error grew.</p>
+  <table border="1" cellpadding="6" style="border-collapse: collapse;">
+    <tr><th>Specification</th><th>Coefficient</th><th>CV MAE rise if removed (mpg)</th></tr>
+    <tr><td>model year</td><td>+0.115</td><td>+0.799</td></tr>
+    <tr><td>weight</td><td>-0.218</td><td>+0.266</td></tr>
+    <tr><td>origin</td><td>-0.057 / +0.037 / +0.020</td><td>+0.029</td></tr>
+    <tr><td>horsepower</td><td>-0.054</td><td>+0.014</td></tr>
+    <tr><td>cylinders</td><td>-0.027</td><td>-0.012</td></tr>
+    <tr><td>displacement</td><td>+0.053</td><td>-0.006</td></tr>
+    <tr><td>acceleration</td><td>-0.007</td><td>-0.009</td></tr>
+  </table>
+  <p><b>Model year matters most, then weight.</b> Cylinders, displacement and acceleration add almost nothing once the other specifications are known (removing them changes the error by less than 0.015 mpg, which is within noise).</p>
+  <p>The two views differ for a reason. Weight has the biggest coefficient, but removing it hurts less than removing model year, because displacement, horsepower and cylinders are strongly related to weight and can partly take over its job. Model year has no substitute. For the same reason, the positive coefficient on displacement should not be read as "bigger engines raise mpg". It comes from related inputs sharing credit.</p>
+
+  <h2>9. Errors</h2>
+  <img src="pred_vs_actual.png" alt="Predicted vs actual mpg for the 80 test cars" width="480">
+  <p>Points close to the red line are good predictions. The model follows the line well, and the biggest misses are at the high-mpg end. The five largest errors on the test set were:</p>
+  <table border="1" cellpadding="6" style="border-collapse: collapse;">
+    <tr><th>Row in CSV</th><th>Specs</th><th>Actual</th><th>Predicted</th><th>Error</th></tr>
+    <tr><td>394</td><td>4 cyl, 97 cu in, 52 hp, 2130 lb, 1982, Europe</td><td>44.0</td><td>36.6</td><td>-7.4</td></tr>
+    <tr><td>377</td><td>4 cyl, 91 cu in, 68 hp, 1970 lb, 1982, Japan</td><td>31.0</td><td>37.1</td><td>+6.1</td></tr>
+    <tr><td>275</td><td>6 cyl, 163 cu in, 125 hp, 3140 lb, 1978, Europe</td><td>17.0</td><td>22.9</td><td>+5.9</td></tr>
+    <tr><td>30</td><td>4 cyl, 140 cu in, 90 hp, 2264 lb, 1971, USA</td><td>28.0</td><td>22.4</td><td>-5.6</td></tr>
+    <tr><td>238</td><td>4 cyl, 98 cu in, 83 hp, 2075 lb, 1977, USA</td><td>33.5</td><td>28.1</td><td>-5.4</td></tr>
+  </table>
+  <p>Four of the five are small, light four-cylinder cars, where very high or low mpg is hardest to predict from the specifications. Row 394 is a light 1982 car that got 44 mpg, about 7 mpg more than its specs suggest. Things the data does not contain (engine tuning, gearing, aerodynamics, how mpg was measured) are possible reasons, but I did not test that.</p>
 </body>
 </html>
 
