@@ -25,3 +25,30 @@
   </ul>
 </body>
 </html>
+  <h2>3. Preprocessing</h2>
+  <p>First I split the data into 318 training cars and 80 test cars (80/20 split, random seed 42). The test cars are not used for any decision about preprocessing, models or tuning.</p>
+  <ul>
+    <li>Missing horsepower values are filled with the median of the training data.</li>
+    <li>The six numeric columns are standardized (subtract the training mean, divide by the training standard deviation).</li>
+    <li>Origin is one-hot encoded, because 1, 2 and 3 are labels and not quantities.</li>
+    <li>The model predicts the log of mpg, and the answer is converted back with exp().</li>
+  </ul>
+  <p>All of this is done inside one scikit-learn pipeline that is fitted on the training data only, so no information from the test set leaks in.</p>
+
+  <h2>4. Baseline and methods</h2>
+  <p><b>Baseline:</b> predict the average mpg of the training cars for every car. Any real model has to beat this.</p>
+  <p><b>Methods tried:</b></p>
+  <ul>
+    <li>Linear regression: simple and easy to interpret.</li>
+    <li>Ridge regression: linear regression with a penalty on large coefficients. It suits this data because weight, displacement, horsepower and cylinders are strongly correlated with each other.</li>
+    <li>Ridge regression on log(mpg): my final model.</li>
+    <li>Random forest and gradient boosting: flexible models, to check how much a simple model gives up.</li>
+  </ul>
+
+  <h2>5. Evaluation</h2>
+  <ul>
+    <li>Models and the ridge penalty were chosen with 5-fold cross-validation on the training set only.</li>
+    <li>The 80 test cars were used once, for the final comparison.</li>
+    <li>Main metric: mean absolute error (MAE) in mpg, which is the average size of a miss. RMSE and R squared are supporting metrics.</li>
+    <li>The dataset is small, so I also report how much the score varies across folds.</li>
+  </ul>
