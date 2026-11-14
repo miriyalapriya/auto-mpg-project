@@ -74,20 +74,108 @@
 
   <p>My final model misses by 1.77 mpg on average, compared with 5.96 mpg for the baseline. Taking the log of mpg was the most useful change: it lowered the cross-validation error from 2.67 to 2.27.</p>
   <p>The random forest is a bit more accurate than my model (test MAE 1.57), and gradient boosting did best in cross-validation. I still chose ridge on log(mpg) because it can be explained from its coefficients and exported as a small file for this website. The test set has only 80 cars, so the small gaps between the better models should not be over-read.</p>
-  <h2>7. Try the model</h2>
-  <p>
-    Weight (lb):
+   <h2>7. Try the model</h2>
+  <p>Move the sliders to design a car. The page applies my ridge model (the numbers in model.json) in your browser and shows the predicted mpg with an approximate range.</p>
+
+  <p>Weight (lb):
     <input id="weight" type="range" min="1600" max="5200" step="10" value="2800">
-    <span id="weightValue">2800</span>
-  </p>
+    <span id="weightValue">2800</span></p>
+
+  <p>Horsepower:
+    <input id="horsepower" type="range" min="45" max="230" step="1" value="93">
+    <span id="horsepowerValue">93</span></p>
+
+  <p>Model year (19xx):
+    <input id="model_year" type="range" min="70" max="82" step="1" value="76">
+    <span id="model_yearValue">76</span></p>
+
+  <p>Displacement (cubic inches):
+    <input id="displacement" type="range" min="65" max="460" step="1" value="150">
+    <span id="displacementValue">150</span></p>
+
+  <p>Acceleration (seconds to 60 mph):
+    <input id="acceleration" type="range" min="8" max="25" step="0.1" value="15.5">
+    <span id="accelerationValue">15.5</span></p>
+
+  <p>Cylinders:
+    <select id="cylinders">
+      <option value="3">3</option>
+      <option value="4" selected>4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+      <option value="8">8</option>
+    </select></p>
+
+  <p>Origin:
+    <select id="origin">
+      <option value="1" selected>USA</option>
+      <option value="2">Europe</option>
+      <option value="3">Japan</option>
+    </select></p>
+
+  <h3>Predicted mpg: <span id="predText">loading...</span></h3>
+  <p>Approximate range: <span id="rangeText">loading...</span></p>
+  <p><i>This is approximate. The range comes from cross-validation errors: for about 80% of cars the true mpg fell inside it (81% of the 80 test cars). It only applies to cars like those in the 1970 to 1982 data.</i></p>
 
   <script>
-    var slider = document.getElementById("weight");
-    var label = document.getElementById("weightValue");
-    slider.addEventListener("input", function () {
-      label.textContent = slider.value;
+    // model will hold the contents of model.json (like a Python dict)
+    var model = null;
+
+    fetch("model.json")
+      .then(function (response) { return response.json(); })
+      .then(function (data) { model = data; update(); });
+
+    // read one input by its id and turn it into a number
+    function getValue(id) {
+      return Number(document.getElementById(id).value);
+    }
+
+    function update() {
+      // show the number next to each slider
+      ["weight", "horsepower", "model_year", "displacement", "acceleration"].forEach(function (id) {
+        document.getElementById(id + "Value").textContent = document.getElementById(id).value;
+      });
+
+      if (model === null) { return; }   // model.json has not loaded yet
+
+      var x = {
+        cylinders: getValue("cylinders"),
+        displacement: getValue("displacement"),
+        horsepower: getValue("horsepower"),
+        weight: getValue("weight"),
+        acceleration: getValue("acceleration"),
+        model_year: getValue("model_year")
+      };
+
+      // log(mpg) = intercept + sum of coefficient * standardized input
+      var s = model.intercept;
+      for (var i = 0; i < model.num_cols.length; i++) {
+        var name = model.num_cols[i];
+        var z = (x[name] - model.means[i]) / model.scales[i];   // standardize
+        s = s + model.coefs[i] * z;
+      }
+
+      // origin: add the coefficient of the chosen origin (one-hot encoding)
+      var origin = getValue("origin");
+      for (var j = 0; j < model.origin_categories.length; j++) {
+        if (model.origin_categories[j] === origin) {
+          s = s + model.coefs[model.num_cols.length + j];
+        }
+      }
+
+      var mpg = Math.exp(s);   // convert from log(mpg) back to mpg
+      document.getElementById("predText").textContent = mpg.toFixed(1) + " mpg";
+      document.getElementById("rangeText").textContent =
+        (mpg * model.range_low).toFixed(1) + " to " + (mpg * model.range_high).toFixed(1) + " mpg";
+    }
+
+    // run update() whenever any input changes
+    ["weight", "horsepower", "model_year", "displacement", "acceleration", "cylinders", "origin"].forEach(function (id) {
+      document.getElementById(id).addEventListener("input", update);
+      document.getElementById(id).addEventListener("change", update);
     });
-  </script>
+  </script> 
+   
 </body>
 </html>
 
