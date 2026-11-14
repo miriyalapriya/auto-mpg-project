@@ -74,6 +74,20 @@
 
   <p>My final model misses by 1.77 mpg on average, compared with 5.96 mpg for the baseline. Taking the log of mpg was the most useful change: it lowered the cross-validation error from 2.67 to 2.27.</p>
   <p>The random forest is a bit more accurate than my model (test MAE 1.57), and gradient boosting did best in cross-validation. I still chose ridge on log(mpg) because it can be explained from its coefficients and exported as a small file for this website. The test set has only 80 cars, so the small gaps between the better models should not be over-read.</p>
+  <h2>7. Try the model</h2>
+  <p>
+    Weight (lb):
+    <input id="weight" type="range" min="1600" max="5200" step="10" value="2800">
+    <span id="weightValue">2800</span>
+  </p>
+
+  <script>
+    var slider = document.getElementById("weight");
+    var label = document.getElementById("weightValue");
+    slider.addEventListener("input", function () {
+      label.textContent = slider.value;
+    });
+  </script>
 </body>
 </html>
 
