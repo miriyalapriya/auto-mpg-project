@@ -202,6 +202,31 @@
     <tr><td>238</td><td>4 cyl, 98 cu in, 83 hp, 2075 lb, 1977, USA</td><td>33.5</td><td>28.1</td><td>-5.4</td></tr>
   </table>
   <p>Four of the five are small, light four-cylinder cars, where very high or low mpg is hardest to predict from the specifications. Row 394 is a light 1982 car that got 44 mpg, about 7 mpg more than its specs suggest. Things the data does not contain (engine tuning, gearing, aerodynamics, how mpg was measured) are possible reasons, but I did not test that.</p>
+  <h2>10. Limitations</h2>
+  <ul>
+    <li><b>Old, narrow data.</b> Only 398 cars from 1970 to 1982. Modern cars (hybrids, turbochargers, electric cars) are far outside it.</li>
+    <li><b>Small test set.</b> With 80 test cars and a single random split, the final scores are noisy. Differences of a few tenths of an mpg between models should not be trusted.</li>
+    <li><b>Prediction is not causation.</b> Model year is the strongest predictor, but a year is not a mechanism. It stands in for things like emissions rules, fuel prices and engine technology changing over time. Related specifications also share credit, so individual coefficients (such as displacement) should not be read as separate effects.</li>
+    <li><b>A simpler model than the best one.</b> The random forest is about 0.2 mpg more accurate on the test set. I chose ridge for interpretability and so it can run in the browser.</li>
+    <li><b>One-size error range.</b> The prediction range is a fixed percentage and does not adapt to each car.</li>
+    <li><b>Test set use.</b> I compared all five models on the test set in one final step and made no changes afterwards, but this is still a small, single-use check.</li>
+  </ul>
+
+  <h2>11. Conclusion</h2>
+  <p>Yes: for 1970 to 1982 cars, design specifications predict mpg well. A ridge model on log(mpg) is wrong by about 1.8 mpg on average on unseen cars, compared with about 6 mpg for the average-mpg baseline, and it explains about 89% of the variation. <b>Model year and weight matter most</b>; cylinders, displacement and acceleration add little once those are known. More flexible models are somewhat more accurate, so there is a modest price for choosing a model that can be explained and run in the browser. The result describes this period and dataset and does not show that the specifications cause the efficiency.</p>
+
+  <h2>12. Reproduce this work</h2>
+  <ol>
+    <li>Get the data from the UCI Auto MPG dataset. A cleaned copy (name column dropped) is in the repository as auto_mpg.csv. Missing horsepower values are empty cells.</li>
+    <li>Open auto_mpg_project.ipynb in Google Colab or Jupyter (Python 3 with pandas, NumPy, scikit-learn and Matplotlib) and run all cells in order.</li>
+    <li>Split: train_test_split with test_size=0.2 and random_state=42 gives 318 training and 80 test rows. Cross-validation uses KFold with 5 splits, shuffle=True and random_state=42.</li>
+    <li>Final model: median imputation, standardization of the six numeric columns, one-hot encoding of origin, then Ridge with alpha=1.0 on log(mpg).</li>
+    <li>The last notebook cell writes model.json (means, scales, coefficients, intercept and error range), which this page loads.</li>
+  </ol>
+  <p>Code and data: <a href="https://github.com/miriyalapriya/auto-mpg-project">github.com/miriyalapriya/auto-mpg-project</a>. No passwords, keys or private data are used. The dataset is public.</p>
+
+  <h2>13. Tools and AI disclosure</h2>
+  <p>I used Python, pandas, NumPy, scikit-learn and Matplotlib for the analysis, Google Colab to run it, and GitHub Pages to host this site. I used an AI assistant (Claude) for planning the project, writing and debugging some notebook code (feature importance, error analysis, the error range and the JSON export), and for guidance and code while building this web page. I ran and checked the code and outputs myself, and I am responsible for every result.</p>
 </body>
 </html>
 
