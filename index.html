@@ -137,6 +137,24 @@
       <li>Quality check: apart from the 6 missing horsepower values there are no missing values. Weight, displacement, cylinders and horsepower are strongly correlated with each other (about 0.84 to 0.95), which matters for choosing and reading the model.</li>
       <li>Source citation: Quinlan, R. (1993). Auto MPG [Dataset]. UCI Machine Learning Repository. <a href="https://doi.org/10.24432/C5859H">https://doi.org/10.24432/C5859H</a></li>
     </ul>
+
+    <h3>Variables and how each was handled</h3>
+    <div class="tablewrap">
+      <table>
+        <tr><th>Variable</th><th>Meaning</th><th>Range in data</th><th>Correlation with mpg</th><th>Issue and handling</th></tr>
+        <tr><td>mpg (target)</td><td>Fuel efficiency, miles per gallon</td><td>9 to 46.6 (mean 23.5)</td><td>-</td><td>No missing values. Modelled as log(mpg).</td></tr>
+        <tr><td>cylinders</td><td>Number of cylinders</td><td>3 to 8</td><td>-0.78</td><td>Used as a number. Very close to displacement (0.95).</td></tr>
+        <tr><td>displacement</td><td>Engine size, cubic inches</td><td>68 to 455</td><td>-0.80</td><td>Standardized.</td></tr>
+        <tr><td>horsepower</td><td>Engine power</td><td>46 to 230</td><td>-0.78</td><td>6 missing values (marked "?" in the raw file). Filled with the training median.</td></tr>
+        <tr><td>weight</td><td>Car weight, pounds</td><td>1613 to 5140</td><td>-0.83</td><td>Standardized. Strongest single link with mpg.</td></tr>
+        <tr><td>acceleration</td><td>Seconds to reach 60 mph</td><td>8 to 24.8</td><td>+0.42</td><td>Standardized.</td></tr>
+        <tr><td>model_year</td><td>Model year (70 = 1970)</td><td>70 to 82</td><td>+0.58</td><td>Used as a number and standardized.</td></tr>
+        <tr><td>origin</td><td>1 = USA, 2 = Europe, 3 = Japan</td><td>1, 2, 3</td><td>+0.56</td><td>These are labels, so one-hot encoded.</td></tr>
+        <tr><td>name</td><td>Car name</td><td>text</td><td>-</td><td>Dropped, because it only identifies a car.</td></tr>
+      </table>
+    </div>
+    <img src="data_overview.png" alt="Histogram of mpg and scatter plot of weight against mpg" width="760">
+    <p><b>Figure.</b> Left: how mpg is spread across the 398 cars (half of the cars are between 17.5 and 29 mpg). Right: heavier cars get lower mpg (correlation -0.83), with the colour showing model year.</p>
   </section>
 
   <section>
@@ -295,7 +313,7 @@
     <p>Points close to the red line are good predictions. The model follows the line well, and the biggest misses are at the high-mpg end. The five largest errors on the test set were:</p>
     <div class="tablewrap">
       <table>
-        <tr><th>Row in CSV</th><th>Specs</th><th>Actual</th><th>Predicted</th><th>Error</th></tr>
+        <tr><th>Row (index in CSV, from 0)</th><th>Specs</th><th>Actual</th><th>Predicted</th><th>Error</th></tr>
         <tr><td>394</td><td>4 cyl, 97 cu in, 52 hp, 2130 lb, 1982, Europe</td><td>44.0</td><td>36.6</td><td>-7.4</td></tr>
         <tr><td>377</td><td>4 cyl, 91 cu in, 68 hp, 1970 lb, 1982, Japan</td><td>31.0</td><td>37.1</td><td>+6.1</td></tr>
         <tr><td>275</td><td>6 cyl, 163 cu in, 125 hp, 3140 lb, 1978, Europe</td><td>17.0</td><td>22.9</td><td>+5.9</td></tr>
@@ -326,11 +344,11 @@
   <section>
     <h2>12. Reproduce this work</h2>
     <ol>
-      <li>Get the data from the UCI Auto MPG dataset. A cleaned copy (name column dropped) is in the repository as auto_mpg.csv. Missing horsepower values are empty cells.</li>
+      <li>Get the data from the UCI Auto MPG dataset. A cleaned copy (name column dropped) is in the repository as auto_mpg.csv. Missing horsepower values are empty cells. The notebook also downloads the data directly from UCI.</li>
       <li>Open auto_mpg_project.ipynb in Google Colab or Jupyter (Python 3 with pandas, NumPy, scikit-learn and Matplotlib) and run all cells in order. The libraries are listed in requirements.txt.</li>
       <li>Split: train_test_split with test_size=0.2 and random_state=42 gives 318 training and 80 test rows. The exact row numbers are saved in train_rows.csv and test_rows.csv. Cross-validation uses KFold with 5 splits, shuffle=True and random_state=42.</li>
       <li>Final model: median imputation, standardization of the six numeric columns, one-hot encoding of origin, then Ridge with alpha=1.0 on log(mpg).</li>
-      <li>The last notebook cell writes model.json (means, scales, coefficients, intercept and error range). Those numbers are what this page uses in the predictor.</li>
+      <li>A notebook cell writes model.json (means, scales, coefficients, intercept and error range). Those numbers are what this page uses in the predictor.</li>
     </ol>
     <p>Code and data: <a href="https://github.com/miriyalapriya/auto-mpg-project">github.com/miriyalapriya/auto-mpg-project</a>. No passwords, keys or private data are used. The dataset is public.</p>
   </section>
