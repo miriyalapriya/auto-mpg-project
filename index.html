@@ -143,9 +143,9 @@
       <table>
         <tr><th>Variable</th><th>Meaning</th><th>Range in data</th><th>Correlation with mpg</th><th>Issue and handling</th></tr>
         <tr><td>mpg (target)</td><td>Fuel efficiency, miles per gallon</td><td>9 to 46.6 (mean 23.5)</td><td>-</td><td>No missing values. Modelled as log(mpg).</td></tr>
-        <tr><td>cylinders</td><td>Number of cylinders</td><td>3 to 8</td><td>-0.78</td><td>Used as a number. Very close to displacement (0.95).</td></tr>
+        <tr><td>cylinders</td><td>Number of cylinders</td><td>3 to 8</td><td>-0.78</td><td>Used as a number and standardized. Very close to displacement (0.95).</td></tr>
         <tr><td>displacement</td><td>Engine size, cubic inches</td><td>68 to 455</td><td>-0.80</td><td>Standardized.</td></tr>
-        <tr><td>horsepower</td><td>Engine power</td><td>46 to 230</td><td>-0.78</td><td>6 missing values (marked "?" in the raw file). Filled with the training median.</td></tr>
+        <tr><td>horsepower</td><td>Engine power</td><td>46 to 230</td><td>-0.78</td><td>6 missing values (marked "?" in the raw file). Filled with the training median, then standardized.</td></tr>
         <tr><td>weight</td><td>Car weight, pounds</td><td>1613 to 5140</td><td>-0.83</td><td>Standardized. Strongest single link with mpg.</td></tr>
         <tr><td>acceleration</td><td>Seconds to reach 60 mph</td><td>8 to 24.8</td><td>+0.42</td><td>Standardized.</td></tr>
         <tr><td>model_year</td><td>Model year (70 = 1970)</td><td>70 to 82</td><td>+0.58</td><td>Used as a number and standardized.</td></tr>
@@ -180,16 +180,17 @@
       <li>Ridge regression on log(mpg): my final model.</li>
       <li>Random forest and gradient boosting: flexible models, to check how much a simple model gives up.</li>
     </ul>
+    <p>The random forest (200 trees) and gradient boosting use scikit-learn default settings with random_state=42 and were not tuned.</p>
   </section>
 
   <section>
     <h2>5. Evaluation</h2>
     <ul>
-      <li>Models and the ridge penalty were chosen with 5-fold cross-validation on the training set only.</li>
-      <li>The 80 test cars were used once, for the final comparison.</li>
+      <li>Models and the ridge penalty were compared with 5-fold cross-validation on the training set only. Gradient boosting had the lowest CV error, but I chose ridge on log(mpg) as my final model because it can be explained from its coefficients and run in the browser (see Section 6).</li>
+      <li>I looked at the 80 test cars only after fixing the models and settings, and changed nothing afterwards.</li>
       <li>Main metric: mean absolute error (MAE) in mpg, which is the average size of a miss. RMSE and R squared are supporting metrics.</li>
       <li>The dataset is small, so I also report how much the score varies across folds.</li>
-      <li>Extra experiments: I tried ridge penalties from 0.01 to 100. The cross-validation error was almost the same from 0.01 to 3 (about 2.27 with the log target), so I kept 1.0. I also compared predicting mpg directly with predicting log(mpg), which is where the improvement from 2.67 to 2.27 comes from. All of these runs are in the notebook.</li>
+      <li>Extra experiments: I tried ridge penalties from 0.01 to 100 on the raw mpg target and from 0.01 to 30 on the log target. The cross-validation error was almost the same from 0.01 to 3 (about 2.27 with the log target), so I kept 1.0. I also compared predicting mpg directly with predicting log(mpg), which is where the improvement from 2.67 to 2.27 comes from. All of these runs are in the notebook.</li>
     </ul>
   </section>
 
@@ -323,13 +324,13 @@
       <p style="font-size:0.85rem;color:#64748b;margin:6px 0 0;">A longer bar means the model got worse by more when that specification was removed (rise in cross-validation MAE, in mpg). Empty bars mean the error did not rise, so those specifications add almost nothing once the others are known.</p>
     </div>
     <div class="callout"><b>Model year matters most, then weight.</b> Cylinders, displacement and acceleration add almost nothing once the other specifications are known (removing them changes the error by less than 0.015 mpg, which is within noise).</div>
-    <p>The two views differ for a reason. Weight has the biggest coefficient, but removing it hurts less than removing model year, because displacement, horsepower and cylinders are strongly related to weight and can partly take over its job. Model year has no substitute. For the same reason, the positive coefficient on displacement should not be read as "bigger engines raise mpg". It comes from related inputs sharing credit.</p>
+    <p>The two views differ, probably for a reason. Weight has the biggest coefficient, but removing it hurts less than removing model year, likely because displacement, horsepower and cylinders are strongly related to weight and can partly take over its job. No other input tracks model year, so removing it hurts more. For the same reason, the positive coefficient on displacement should not be read as "bigger engines raise mpg". It likely comes from related inputs sharing credit.</p>
   </section>
 
   <section>
     <h2>9. Errors</h2>
     <img src="pred_vs_actual.png" alt="Predicted vs actual mpg for the 80 test cars" width="480">
-    <p>Points close to the red line are good predictions. The model follows the line well, and the biggest misses are at the high-mpg end. The five largest errors on the test set were:</p>
+    <p>Points close to the red line are good predictions. The model follows the line well, and the biggest misses are mostly at the high-mpg end. Error = predicted minus actual. The five largest errors on the test set were:</p>
     <div class="tablewrap">
       <table>
         <tr><th>Row (index in CSV, from 0)</th><th>Specs</th><th>Actual</th><th>Predicted</th><th>Error</th></tr>
