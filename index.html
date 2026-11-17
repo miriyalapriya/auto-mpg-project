@@ -311,6 +311,17 @@
         <tr><td>acceleration</td><td>-0.007</td><td>-0.009</td></tr>
       </table>
     </div>
+        <h3>How much the error grows when a specification is removed</h3>
+    <div style="margin: 10px 0 14px;">
+      <div style="display:flex;align-items:center;gap:10px;margin:6px 0;font-size:0.9rem;"><span style="width:110px;">model year</span><div style="flex:1;background:#e2e8f0;border-radius:6px;height:16px;"><div style="width:99.9%;background:#4f46e5;height:16px;border-radius:6px;"></div></div><span style="width:90px;text-align:right;">+0.799</span></div>
+      <div style="display:flex;align-items:center;gap:10px;margin:6px 0;font-size:0.9rem;"><span style="width:110px;">weight</span><div style="flex:1;background:#e2e8f0;border-radius:6px;height:16px;"><div style="width:33.3%;background:#4f46e5;height:16px;border-radius:6px;"></div></div><span style="width:90px;text-align:right;">+0.266</span></div>
+      <div style="display:flex;align-items:center;gap:10px;margin:6px 0;font-size:0.9rem;"><span style="width:110px;">origin</span><div style="flex:1;background:#e2e8f0;border-radius:6px;height:16px;"><div style="width:3.6%;background:#4f46e5;height:16px;border-radius:6px;"></div></div><span style="width:90px;text-align:right;">+0.029</span></div>
+      <div style="display:flex;align-items:center;gap:10px;margin:6px 0;font-size:0.9rem;"><span style="width:110px;">horsepower</span><div style="flex:1;background:#e2e8f0;border-radius:6px;height:16px;"><div style="width:1.8%;background:#4f46e5;height:16px;border-radius:6px;"></div></div><span style="width:90px;text-align:right;">+0.014</span></div>
+      <div style="display:flex;align-items:center;gap:10px;margin:6px 0;font-size:0.9rem;"><span style="width:110px;">cylinders</span><div style="flex:1;background:#e2e8f0;border-radius:6px;height:16px;"></div><span style="width:90px;text-align:right;">-0.012</span></div>
+      <div style="display:flex;align-items:center;gap:10px;margin:6px 0;font-size:0.9rem;"><span style="width:110px;">displacement</span><div style="flex:1;background:#e2e8f0;border-radius:6px;height:16px;"></div><span style="width:90px;text-align:right;">-0.006</span></div>
+      <div style="display:flex;align-items:center;gap:10px;margin:6px 0;font-size:0.9rem;"><span style="width:110px;">acceleration</span><div style="flex:1;background:#e2e8f0;border-radius:6px;height:16px;"></div><span style="width:90px;text-align:right;">-0.009</span></div>
+      <p style="font-size:0.85rem;color:#64748b;margin:6px 0 0;">A longer bar means the model got worse by more when that specification was removed (rise in cross-validation MAE, in mpg). Empty bars mean the error did not rise, so those specifications add almost nothing once the others are known.</p>
+    </div>
     <div class="callout"><b>Model year matters most, then weight.</b> Cylinders, displacement and acceleration add almost nothing once the other specifications are known (removing them changes the error by less than 0.015 mpg, which is within noise).</div>
     <p>The two views differ for a reason. Weight has the biggest coefficient, but removing it hurts less than removing model year, because displacement, horsepower and cylinders are strongly related to weight and can partly take over its job. Model year has no substitute. For the same reason, the positive coefficient on displacement should not be read as "bigger engines raise mpg". It comes from related inputs sharing credit.</p>
   </section>
