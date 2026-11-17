@@ -5,9 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Predicting Car Fuel Efficiency</title>
   <style>
+    html { scroll-behavior: smooth; }
     body { max-width: 820px; margin: auto; padding: 24px 20px 60px; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; line-height: 1.65; color: #1b1f24; background: #ffffff; }
     h1 { font-size: 1.9rem; line-height: 1.25; margin-bottom: 4px; }
-    h2 { margin-top: 42px; padding-top: 18px; border-top: 1px solid #d8dee4; font-size: 1.35rem; }
+    h2 { margin-top: 42px; padding-top: 18px; border-top: 1px solid #d8dee4; font-size: 1.35rem; scroll-margin-top: 60px; }
     h3 { font-size: 1.05rem; margin-top: 22px; }
     a { color: #1f6feb; }
     ul, ol { padding-left: 24px; }
@@ -17,6 +18,16 @@
     tr.final td { background: #ddf4ff; font-weight: 600; }
     img { max-width: 100%; height: auto; border: 1px solid #d8dee4; border-radius: 8px; }
     .subtitle { color: #57606a; margin: 0 0 6px; }
+
+    /* banner at the top */
+    .hero { background: linear-gradient(135deg, #0b3d91, #1f6feb 60%, #54aeff); background-size: cover; background-position: center; color: #ffffff; border-radius: 14px; padding: 48px 28px; margin-bottom: 14px; }
+    .hero h1 { color: #ffffff; margin: 0 0 8px; }
+    .hero .subtitle { color: #dbeafe; margin: 0; }
+
+    /* menu bar */
+    #nav { position: sticky; top: 0; z-index: 10; display: flex; gap: 6px; overflow-x: auto; white-space: nowrap; background: #ffffff; padding: 10px 0; border-bottom: 1px solid #d8dee4; margin-bottom: 14px; }
+    #nav a { text-decoration: none; font-size: 0.85rem; padding: 6px 12px; border-radius: 16px; background: #f6f8fa; border: 1px solid #d8dee4; color: #1b1f24; }
+    #nav a:hover { background: #ddf4ff; border-color: #1f6feb; color: #1f6feb; }
 
     /* "Try the model" card */
     #predictor { background: #f6f8fa; border: 1px solid #d8dee4; border-radius: 14px; padding: 22px; margin: 16px 0 24px; }
@@ -39,8 +50,11 @@
   </style>
 </head>
 <body>
-  <h1>Predicting Car Fuel Efficiency from Design Specifications</h1>
-  <p class="subtitle">ES 335 project by Miriyala Sai Priya</p>
+  <div class="hero">
+    <h1>Predicting Car Fuel Efficiency from Design Specifications</h1>
+    <p class="subtitle">ES 335 project by Miriyala Sai Priya</p>
+  </div>
+  <nav id="nav"></nav>
   <p>Links: <a href="https://github.com/miriyalapriya/auto-mpg-project">GitHub repository</a> | <a href="https://github.com/miriyalapriya/auto-mpg-project/blob/main/auto_mpg_project.ipynb">full notebook</a> | <a href="https://github.com/miriyalapriya/auto-mpg-project/blob/main/auto_mpg.csv">data (CSV)</a> | <a href="https://github.com/miriyalapriya/auto-mpg-project/blob/main/model.json">exported model</a></p>
 
   <h2>1. The question</h2>
@@ -226,103 +240,3 @@
       for (var j = 0; j < model.origin_categories.length; j++) {
         if (model.origin_categories[j] === origin) {
           s = s + model.coefs[model.num_cols.length + j];
-        }
-      }
-
-      var mpg = Math.exp(s);   // convert from log(mpg) back to mpg
-      var low = mpg * model.range_low;
-      var high = mpg * model.range_high;
-
-      document.getElementById("predText").textContent = mpg.toFixed(1) + " mpg";
-      document.getElementById("rangeText").textContent = low.toFixed(1) + " to " + high.toFixed(1) + " mpg";
-
-      // draw the range bar: light blue span for the range, dark blue line for the prediction
-      document.getElementById("spanbar").style.left = pos(low) + "%";
-      document.getElementById("spanbar").style.width = (pos(high) - pos(low)) + "%";
-      document.getElementById("dot").style.left = "calc(" + pos(mpg) + "% - 2px)";
-    }
-
-    // example cars for the buttons
-    var presets = {
-      small: { cylinders: 4, displacement: 97, horsepower: 52, weight: 2130, acceleration: 24.6, model_year: 82, origin: 2 },
-      big:   { cylinders: 8, displacement: 350, horsepower: 165, weight: 3690, acceleration: 11.5, model_year: 70, origin: 1 },
-      avg:   { cylinders: 4, displacement: 150, horsepower: 93, weight: 2800, acceleration: 15.5, model_year: 76, origin: 1 }
-    };
-    Array.prototype.forEach.call(document.querySelectorAll("[data-preset]"), function (button) {
-      button.addEventListener("click", function () {
-        var p = presets[button.getAttribute("data-preset")];
-        Object.keys(p).forEach(function (key) {
-          document.getElementById(key).value = p[key];
-        });
-        update();
-      });
-    });
-
-    // run update() whenever any input changes
-    ["weight", "horsepower", "model_year", "displacement", "acceleration", "cylinders", "origin"].forEach(function (id) {
-      document.getElementById(id).addEventListener("input", update);
-      document.getElementById(id).addEventListener("change", update);
-    });
-  </script>
-
-  <h2>8. Which specifications matter most?</h2>
-  <p>I looked at this in two ways. First, the ridge coefficients on standardized inputs (these act on log(mpg), so a bigger absolute value means a bigger push). Second, I removed one specification at a time, refitted the model, and measured how much the cross-validation error grew.</p>
-  <table>
-    <tr><th>Specification</th><th>Coefficient</th><th>CV MAE rise if removed (mpg)</th></tr>
-    <tr><td>model year</td><td>+0.115</td><td>+0.799</td></tr>
-    <tr><td>weight</td><td>-0.218</td><td>+0.266</td></tr>
-    <tr><td>origin</td><td>-0.057 / +0.037 / +0.020</td><td>+0.029</td></tr>
-    <tr><td>horsepower</td><td>-0.054</td><td>+0.014</td></tr>
-    <tr><td>cylinders</td><td>-0.027</td><td>-0.012</td></tr>
-    <tr><td>displacement</td><td>+0.053</td><td>-0.006</td></tr>
-    <tr><td>acceleration</td><td>-0.007</td><td>-0.009</td></tr>
-  </table>
-  <p><b>Model year matters most, then weight.</b> Cylinders, displacement and acceleration add almost nothing once the other specifications are known (removing them changes the error by less than 0.015 mpg, which is within noise).</p>
-  <p>The two views differ for a reason. Weight has the biggest coefficient, but removing it hurts less than removing model year, because displacement, horsepower and cylinders are strongly related to weight and can partly take over its job. Model year has no substitute. For the same reason, the positive coefficient on displacement should not be read as "bigger engines raise mpg". It comes from related inputs sharing credit.</p>
-
-  <h2>9. Errors</h2>
-  <img src="pred_vs_actual.png" alt="Predicted vs actual mpg for the 80 test cars" width="480">
-  <p>Points close to the red line are good predictions. The model follows the line well, and the biggest misses are at the high-mpg end. The five largest errors on the test set were:</p>
-  <table>
-    <tr><th>Row in CSV</th><th>Specs</th><th>Actual</th><th>Predicted</th><th>Error</th></tr>
-    <tr><td>394</td><td>4 cyl, 97 cu in, 52 hp, 2130 lb, 1982, Europe</td><td>44.0</td><td>36.6</td><td>-7.4</td></tr>
-    <tr><td>377</td><td>4 cyl, 91 cu in, 68 hp, 1970 lb, 1982, Japan</td><td>31.0</td><td>37.1</td><td>+6.1</td></tr>
-    <tr><td>275</td><td>6 cyl, 163 cu in, 125 hp, 3140 lb, 1978, Europe</td><td>17.0</td><td>22.9</td><td>+5.9</td></tr>
-    <tr><td>30</td><td>4 cyl, 140 cu in, 90 hp, 2264 lb, 1971, USA</td><td>28.0</td><td>22.4</td><td>-5.6</td></tr>
-    <tr><td>238</td><td>4 cyl, 98 cu in, 83 hp, 2075 lb, 1977, USA</td><td>33.5</td><td>28.1</td><td>-5.4</td></tr>
-  </table>
-  <p>Four of the five are small, light four-cylinder cars, where very high or low mpg is hardest to predict from the specifications. Row 394 is a light 1982 car that got 44 mpg, about 7 mpg more than its specs suggest. Things the data does not contain (engine tuning, gearing, aerodynamics, how mpg was measured) are possible reasons, but I did not test that.</p>
-
-  <h2>10. Limitations</h2>
-  <ul>
-    <li><b>Old, narrow data.</b> Only 398 cars from 1970 to 1982. Modern cars (hybrids, turbochargers, electric cars) are far outside it.</li>
-    <li><b>Small test set.</b> With 80 test cars and a single random split, the final scores are noisy. Differences of a few tenths of an mpg between models should not be trusted.</li>
-    <li><b>Prediction is not causation.</b> Model year is the strongest predictor, but a year is not a mechanism. It stands in for things like emissions rules, fuel prices and engine technology changing over time. Related specifications also share credit, so individual coefficients (such as displacement) should not be read as separate effects.</li>
-    <li><b>A simpler model than the best one.</b> The random forest is about 0.2 mpg more accurate on the test set. I chose ridge for interpretability and so it can run in the browser.</li>
-    <li><b>One-size error range.</b> The prediction range is a fixed percentage and does not adapt to each car.</li>
-    <li><b>Test set use.</b> I compared all five models on the test set in one final step and made no changes afterwards, but this is still a small, single-use check.</li>
-  </ul>
-
-  <h2>11. Conclusion</h2>
-  <p>Yes: for 1970 to 1982 cars, design specifications predict mpg well. A ridge model on log(mpg) is wrong by about 1.8 mpg on average on unseen cars, compared with about 6 mpg for the average-mpg baseline, and it explains about 89% of the variation. <b>Model year and weight matter most</b>; cylinders, displacement and acceleration add little once those are known. More flexible models are somewhat more accurate, so there is a modest price for choosing a model that can be explained and run in the browser. The result describes this period and dataset and does not show that the specifications cause the efficiency.</p>
-
-  <h2>12. Reproduce this work</h2>
-  <ol>
-    <li>Get the data from the UCI Auto MPG dataset. A cleaned copy (name column dropped) is in the repository as auto_mpg.csv. Missing horsepower values are empty cells.</li>
-    <li>Open auto_mpg_project.ipynb in Google Colab or Jupyter (Python 3 with pandas, NumPy, scikit-learn and Matplotlib) and run all cells in order. The libraries are listed in requirements.txt.</li>
-    <li>Split: train_test_split with test_size=0.2 and random_state=42 gives 318 training and 80 test rows. The exact row numbers are saved in train_rows.csv and test_rows.csv. Cross-validation uses KFold with 5 splits, shuffle=True and random_state=42.</li>
-    <li>Final model: median imputation, standardization of the six numeric columns, one-hot encoding of origin, then Ridge with alpha=1.0 on log(mpg).</li>
-    <li>The last notebook cell writes model.json (means, scales, coefficients, intercept and error range), which this page loads.</li>
-  </ol>
-  <p>Code and data: <a href="https://github.com/miriyalapriya/auto-mpg-project">github.com/miriyalapriya/auto-mpg-project</a>. No passwords, keys or private data are used. The dataset is public.</p>
-
-  <h2>13. Tools and AI disclosure</h2>
-  <p>I used Python, pandas, NumPy, scikit-learn and Matplotlib for the analysis, Google Colab to run it, and GitHub Pages to host this site. I used an AI assistant (Claude) for planning the project, writing and debugging some notebook code (feature importance, error analysis, the error range and the JSON export), and for guidance and code while building this web page. I ran and checked the code and outputs myself, and I am responsible for every result.</p>
-
-  <h2>14. References</h2>
-  <ul>
-    <li>Quinlan, R. (1993). Auto MPG [Dataset]. UCI Machine Learning Repository. https://doi.org/10.24432/C5859H (CC BY 4.0).</li>
-    <li>Pedregosa, F. et al. (2011). Scikit-learn: Machine Learning in Python. Journal of Machine Learning Research, 12, 2825-2830.</li>
-  </ul>
-</body>
-</html>
