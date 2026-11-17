@@ -16,21 +16,24 @@ Ridge regression on log(mpg) misses by 1.77 mpg on average on 80 held-out test c
 - `auto_mpg.csv`: the data (UCI Auto MPG, car name column dropped)
 - `model.json`: the exported ridge model (means, scales, coefficients, intercept, error range)
 - `pred_vs_actual.png`: predicted vs actual mpg plot for the test set
+- `data_overview.png`: histogram of mpg and weight vs mpg scatter plot
 - `train_rows.csv`, `test_rows.csv`: the exact rows used for training and testing
 - `requirements.txt`: Python libraries
 
 ## How to reproduce
 1. Open `auto_mpg_project.ipynb` in Google Colab or Jupyter.
-2. Make sure `auto_mpg.csv` is in the same folder (in Colab, upload it, or load it from this repository).
-3. Install the libraries if needed: `pip install -r requirements.txt` (tested with pandas 2.2.3 and scikit-learn 1.6.1).
-4. Run all cells in order. The last cell writes `model.json`.
+2. Install the libraries if needed: `pip install -r requirements.txt` (tested with pandas 2.2.3 and scikit-learn 1.6.1).
+3. Run all cells in order. The data cell downloads the dataset from UCI. If the download fails, put `auto_mpg.csv` in the same folder and the notebook will use it.
+4. The later cells write `model.json`, `train_rows.csv`, `test_rows.csv` and `data_overview.png`.
 
 ## Method summary
 - Split: `train_test_split(test_size=0.2, random_state=42)` gives 318 training and 80 test cars.
 - Cross-validation: `KFold(5, shuffle=True, random_state=42)` on the training set only.
 - Pipeline: median imputation for horsepower, standardization of the six numeric columns, one-hot encoding of origin, then Ridge (alpha=1.0) on log(mpg).
 - Compared against: baseline (training mean), linear regression, ridge, random forest, gradient boosting.
-- The test set was used once, for the final comparison.
+- Random forest (200 trees) and gradient boosting use scikit-learn default settings with `random_state=42` and were not tuned.
+- Extra experiments in the notebook: ridge penalty sweep, raw vs. log target, and one-at-a-time feature removal.
+- The test set was used only after the models and settings were fixed, and nothing was changed afterwards.
 
 ## Data access
 The Auto MPG dataset is public and free on the UCI Machine Learning Repository (https://doi.org/10.24432/C5859H, licence CC BY 4.0). A copy is included as `auto_mpg.csv`. No passwords, keys or private data are used.
