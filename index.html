@@ -4,239 +4,64 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Predicting Car Fuel Efficiency</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
+    :root { --ink: #0f172a; --muted: #64748b; --line: #e2e8f0; --bg: #f1f5f9; --card: #ffffff; --accent: #4f46e5; --accent2: #0ea5e9; --soft: #eef2ff; }
+    * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
-    body { max-width: 820px; margin: auto; padding: 24px 20px 60px; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; line-height: 1.65; color: #1b1f24; background: #ffffff; }
-    h1 { font-size: 1.9rem; line-height: 1.25; margin-bottom: 4px; }
-    h2 { margin-top: 42px; padding-top: 18px; border-top: 1px solid #d8dee4; font-size: 1.35rem; scroll-margin-top: 60px; }
-    h3 { font-size: 1.05rem; margin-top: 22px; }
-    a { color: #1f6feb; }
-    ul, ol { padding-left: 24px; }
-    table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 0.93rem; }
-    th, td { border-bottom: 1px solid #d8dee4; padding: 8px 10px; text-align: left; }
-    th { background: #f6f8fa; font-weight: 600; }
-    tr.final td { background: #ddf4ff; font-weight: 600; }
-    img { max-width: 100%; height: auto; border: 1px solid #d8dee4; border-radius: 8px; }
-    .subtitle { color: #57606a; margin: 0 0 6px; }
+    body { margin: 0; font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; line-height: 1.7; color: var(--ink); background: var(--bg); }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 20px 18px 70px; }
+    a { color: var(--accent); }
+    ul, ol { padding-left: 22px; }
+    li { margin-bottom: 4px; }
 
-    /* banner at the top */
-    .hero { background: linear-gradient(135deg, #0b3d91, #1f6feb 60%, #54aeff); background-size: cover; background-position: center; color: #ffffff; border-radius: 14px; padding: 48px 28px; margin-bottom: 14px; }
-    .hero h1 { color: #ffffff; margin: 0 0 8px; }
-    .hero .subtitle { color: #dbeafe; margin: 0; }
+    /* hero */
+    .hero { background: linear-gradient(135deg, #0f172a 0%, #312e81 55%, #0ea5e9 130%); color: #ffffff; border-radius: 22px; padding: 40px 34px 30px; position: relative; overflow: hidden; }
+    .hero::after { content: ""; position: absolute; right: -80px; top: -80px; width: 280px; height: 280px; border-radius: 50%; background: rgba(255,255,255,0.07); }
+    .hero-top { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; justify-content: space-between; position: relative; z-index: 1; }
+    .hero-text { flex: 1 1 360px; }
+    .tag { display: inline-block; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; background: rgba(255,255,255,0.14); padding: 4px 12px; border-radius: 20px; margin-bottom: 14px; }
+    .hero h1 { font-size: 2.15rem; line-height: 1.2; margin: 0 0 10px; font-weight: 800; }
+    .hero .subtitle { margin: 0; color: #c7d2fe; }
+    .hero svg { flex: 0 1 280px; max-width: 100%; height: auto; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-top: 26px; position: relative; z-index: 1; }
+    .stat { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.18); border-radius: 14px; padding: 14px 16px; }
+    .stat b { display: block; font-size: 1.7rem; line-height: 1.2; font-weight: 800; }
+    .stat span { font-size: 0.82rem; color: #c7d2fe; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; position: relative; z-index: 1; }
+    .chips a { text-decoration: none; font-size: 0.84rem; font-weight: 600; color: #ffffff; background: rgba(255,255,255,0.14); border: 1px solid rgba(255,255,255,0.25); padding: 6px 14px; border-radius: 20px; }
+    .chips a:hover { background: #ffffff; color: #312e81; }
 
-    /* menu bar */
-    #nav { position: sticky; top: 0; z-index: 10; display: flex; gap: 6px; overflow-x: auto; white-space: nowrap; background: #ffffff; padding: 10px 0; border-bottom: 1px solid #d8dee4; margin-bottom: 14px; }
-    #nav a { text-decoration: none; font-size: 0.85rem; padding: 6px 12px; border-radius: 16px; background: #f6f8fa; border: 1px solid #d8dee4; color: #1b1f24; }
-    #nav a:hover { background: #ddf4ff; border-color: #1f6feb; color: #1f6feb; }
+    /* menu */
+    #nav { position: sticky; top: 8px; z-index: 20; display: flex; gap: 6px; overflow-x: auto; white-space: nowrap; background: rgba(255,255,255,0.92); backdrop-filter: blur(8px); padding: 9px 10px; border: 1px solid var(--line); border-radius: 14px; margin: 14px 0 6px; box-shadow: 0 4px 14px rgba(15,23,42,0.08); }
+    #nav a { text-decoration: none; font-size: 0.82rem; font-weight: 600; padding: 6px 12px; border-radius: 16px; color: #334155; background: #f8fafc; border: 1px solid var(--line); }
+    #nav a:hover { background: var(--soft); border-color: var(--accent); color: var(--accent); }
 
-    /* "Try the model" card */
-    #predictor { background: #f6f8fa; border: 1px solid #d8dee4; border-radius: 14px; padding: 22px; margin: 16px 0 24px; }
-    .presets button { font-size: 0.88rem; padding: 7px 12px; margin: 0 8px 8px 0; border: 1px solid #d8dee4; background: #ffffff; border-radius: 8px; cursor: pointer; }
-    .presets button:hover { border-color: #1f6feb; color: #1f6feb; }
-    .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px 28px; margin-top: 8px; }
-    .ctl label { display: flex; justify-content: space-between; font-weight: 600; font-size: 0.92rem; margin-bottom: 4px; }
-    .ctl .val { color: #1f6feb; font-variant-numeric: tabular-nums; }
-    .ctl input[type=range] { width: 100%; accent-color: #1f6feb; }
-    .ctl select { width: 100%; padding: 7px; font-size: 0.95rem; border: 1px solid #d8dee4; border-radius: 8px; background: #ffffff; }
-    .result { text-align: center; background: #ffffff; border: 1px solid #d8dee4; border-radius: 12px; padding: 18px 10px 14px; margin-top: 22px; }
-    .result .label { color: #57606a; font-size: 0.9rem; }
-    .result .big { font-size: 3rem; font-weight: 700; line-height: 1.1; color: #1f6feb; }
-    .result .rng { color: #57606a; margin-top: 4px; }
-    .scale { position: relative; height: 14px; background: #eaeef2; border-radius: 7px; margin: 16px 14px 4px; }
-    .scale .span { position: absolute; top: 0; height: 14px; background: #9ec5fe; border-radius: 7px; }
-    .scale .dot { position: absolute; top: -3px; width: 4px; height: 20px; background: #1f6feb; border-radius: 2px; }
-    .scalelab { display: flex; justify-content: space-between; font-size: 0.78rem; color: #57606a; margin: 0 14px; }
-    .note { border-left: 4px solid #bf8700; background: #ffffff; padding: 10px 14px; margin-top: 16px; border-radius: 0 8px 8px 0; font-size: 0.9rem; color: #424a53; }
-  </style>
-</head>
-<body>
-  <div class="hero">
-    <h1>Predicting Car Fuel Efficiency from Design Specifications</h1>
-    <p class="subtitle">ES 335 project by Miriyala Sai Priya</p>
-  </div>
-  <nav id="nav"></nav>
-  <p>Links: <a href="https://github.com/miriyalapriya/auto-mpg-project">GitHub repository</a> | <a href="https://github.com/miriyalapriya/auto-mpg-project/blob/main/auto_mpg_project.ipynb">full notebook</a> | <a href="https://github.com/miriyalapriya/auto-mpg-project/blob/main/auto_mpg.csv">data (CSV)</a> | <a href="https://github.com/miriyalapriya/auto-mpg-project/blob/main/model.json">exported model</a></p>
+    /* sections as cards */
+    section { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 26px 28px; margin-top: 20px; box-shadow: 0 2px 10px rgba(15,23,42,0.04); scroll-margin-top: 70px; }
+    h2 { margin: 0 0 12px; font-size: 1.35rem; font-weight: 700; padding-left: 14px; border-left: 5px solid var(--accent); line-height: 1.3; }
+    h3 { font-size: 1rem; margin: 22px 0 6px; color: #334155; }
+    .callout { background: var(--soft); border-left: 4px solid var(--accent); border-radius: 0 10px 10px 0; padding: 10px 16px; margin: 14px 0; }
 
-  <h2>1. The question</h2>
-  <p>Can a car's fuel efficiency (mpg) be predicted from its design specifications alone (cylinders, displacement, horsepower, weight, acceleration, model year and origin), and which specifications matter most for the prediction?</p>
-  <p>The data covers cars from 1970 to 1982, so I only claim that the model describes this period, not modern cars. I do not claim that the specifications cause mpg, only that they predict it.</p>
-  <p>One row of the data is one car model, and the target is its mpg. A prediction like this would be made at design time, before the car is built or road-tested, using only its specifications.</p>
+    /* tables */
+    .tablewrap { overflow-x: auto; margin: 10px 0 14px; border: 1px solid var(--line); border-radius: 12px; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.9rem; }
+    th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--line); }
+    th { background: #f8fafc; font-weight: 600; color: #334155; white-space: nowrap; }
+    tr:last-child td { border-bottom: none; }
+    tr.final td { background: var(--soft); font-weight: 700; color: #3730a3; }
+    img { max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: 12px; }
 
-  <h2>2. The data</h2>
-  <p>Source: the UCI Machine Learning Repository, Auto MPG dataset. One row is one car model.</p>
-  <ul>
-    <li>398 cars in total</li>
-    <li>Target: mpg</li>
-    <li>7 input variables: cylinders, displacement, horsepower, weight, acceleration, model year, origin (1 = USA, 2 = Europe, 3 = Japan)</li>
-    <li>The car name column was dropped because it is only an identifier</li>
-    <li>Horsepower has 6 missing values</li>
-    <li>Data access: public and free to download from UCI (licence CC BY 4.0). A copy is in the repository as auto_mpg.csv. UCI had already removed 8 cars whose mpg was unknown.</li>
-    <li>Quality check: apart from the 6 missing horsepower values there are no missing values. Weight, displacement, cylinders and horsepower are strongly correlated with each other (about 0.84 to 0.95), which matters for choosing and reading the model.</li>
-    <li>Source citation: Quinlan, R. (1993). Auto MPG [Dataset]. UCI Machine Learning Repository. <a href="https://doi.org/10.24432/C5859H">https://doi.org/10.24432/C5859H</a></li>
-  </ul>
-
-  <h2>3. Preprocessing</h2>
-  <p>First I split the data into 318 training cars and 80 test cars (80/20 split, random seed 42). The test cars are not used for any decision about preprocessing, models or tuning.</p>
-  <ul>
-    <li>Missing horsepower values are filled with the median of the training data.</li>
-    <li>The six numeric columns are standardized (subtract the training mean, divide by the training standard deviation).</li>
-    <li>Origin is one-hot encoded, because 1, 2 and 3 are labels and not quantities.</li>
-    <li>The model predicts the log of mpg, and the answer is converted back with exp().</li>
-  </ul>
-  <p>All of this is done inside one scikit-learn pipeline that is fitted on the training data only, so no information from the test set leaks in.</p>
-  <p><b>Why these choices.</b> The median is used for missing horsepower because only 6 values are missing and the median is not pulled by extreme cars. Standardizing puts all inputs on the same scale, which the ridge penalty needs to treat them fairly. One-hot encoding avoids pretending that Japan (3) is "more" than USA (1). Predicting log(mpg) lowered the cross-validation error from 2.67 to 2.27 (see results).</p>
-
-  <h2>4. Baseline and methods</h2>
-  <p><b>Baseline:</b> predict the average mpg of the training cars for every car. Any real model has to beat this.</p>
-  <p><b>Methods tried:</b></p>
-  <ul>
-    <li>Linear regression: simple and easy to interpret.</li>
-    <li>Ridge regression: linear regression with a penalty on large coefficients. It suits this data because weight, displacement, horsepower and cylinders are strongly correlated with each other.</li>
-    <li>Ridge regression on log(mpg): my final model.</li>
-    <li>Random forest and gradient boosting: flexible models, to check how much a simple model gives up.</li>
-  </ul>
-
-  <h2>5. Evaluation</h2>
-  <ul>
-    <li>Models and the ridge penalty were chosen with 5-fold cross-validation on the training set only.</li>
-    <li>The 80 test cars were used once, for the final comparison.</li>
-    <li>Main metric: mean absolute error (MAE) in mpg, which is the average size of a miss. RMSE and R squared are supporting metrics.</li>
-    <li>The dataset is small, so I also report how much the score varies across folds.</li>
-    <li>Extra experiments: I tried ridge penalties from 0.01 to 100. The cross-validation error was almost the same from 0.01 to 3 (about 2.27 with the log target), so I kept 1.0. I also compared predicting mpg directly with predicting log(mpg), which is where the improvement from 2.67 to 2.27 comes from. All of these runs are in the notebook.</li>
-  </ul>
-
-  <h2>6. Results</h2>
-
-  <h3>Cross-validation on the training set (lower MAE is better)</h3>
-  <table>
-    <tr><th>Model</th><th>CV MAE (mpg)</th></tr>
-    <tr><td>Linear regression</td><td>2.683 &plusmn; 0.160</td></tr>
-    <tr><td>Ridge (penalty 1)</td><td>2.668 &plusmn; 0.160</td></tr>
-    <tr class="final"><td>Ridge on log(mpg) (final)</td><td>2.267 &plusmn; 0.114</td></tr>
-    <tr><td>Random forest</td><td>2.042 &plusmn; 0.097</td></tr>
-    <tr><td>Gradient boosting</td><td>1.978 &plusmn; 0.181</td></tr>
-  </table>
-
-  <h3>Final test set (80 held-out cars)</h3>
-  <table>
-    <tr><th>Model</th><th>MAE</th><th>RMSE</th><th>R squared</th></tr>
-    <tr><td>Baseline (training mean)</td><td>5.955</td><td>7.347</td><td>-0.004</td></tr>
-    <tr><td>Linear regression</td><td>2.288</td><td>2.888</td><td>0.845</td></tr>
-    <tr class="final"><td>Ridge on log(mpg) (final)</td><td>1.772</td><td>2.382</td><td>0.894</td></tr>
-    <tr><td>Random forest</td><td>1.567</td><td>2.157</td><td>0.914</td></tr>
-    <tr><td>Gradient boosting</td><td>1.762</td><td>2.345</td><td>0.898</td></tr>
-  </table>
-
-  <p>My final model misses by 1.77 mpg on average, compared with 5.96 mpg for the baseline. Taking the log of mpg was the most useful change: it lowered the cross-validation error from 2.67 to 2.27.</p>
-  <p>The random forest is a bit more accurate than my model (test MAE 1.57), and gradient boosting did best in cross-validation. I still chose ridge on log(mpg) because it can be explained from its coefficients and exported as a small file for this website. The test set has only 80 cars, so the small gaps between the better models should not be over-read.</p>
-
-  <h2>7. Try the model</h2>
-  <p>Move the sliders to design a car. The page applies my ridge model (the numbers in model.json) in your browser and shows the predicted mpg with an approximate range.</p>
-
-  <div id="predictor">
-    <div class="presets">
-      <button type="button" data-preset="small">Small light 1982 car</button>
-      <button type="button" data-preset="big">Big heavy 1970 V8</button>
-      <button type="button" data-preset="avg">Typical car</button>
-    </div>
-
-    <div class="controls">
-      <div class="ctl">
-        <label for="weight">Weight (lb) <span class="val" id="weightValue">2800</span></label>
-        <input id="weight" type="range" min="1600" max="5200" step="10" value="2800">
-      </div>
-      <div class="ctl">
-        <label for="horsepower">Horsepower <span class="val" id="horsepowerValue">93</span></label>
-        <input id="horsepower" type="range" min="45" max="230" step="1" value="93">
-      </div>
-      <div class="ctl">
-        <label for="model_year">Model year (19xx) <span class="val" id="model_yearValue">76</span></label>
-        <input id="model_year" type="range" min="70" max="82" step="1" value="76">
-      </div>
-      <div class="ctl">
-        <label for="displacement">Displacement (cubic inches) <span class="val" id="displacementValue">150</span></label>
-        <input id="displacement" type="range" min="65" max="460" step="1" value="150">
-      </div>
-      <div class="ctl">
-        <label for="acceleration">Acceleration (seconds to 60 mph) <span class="val" id="accelerationValue">15.5</span></label>
-        <input id="acceleration" type="range" min="8" max="25" step="0.1" value="15.5">
-      </div>
-      <div class="ctl">
-        <label for="cylinders">Cylinders</label>
-        <select id="cylinders">
-          <option value="3">3</option>
-          <option value="4" selected>4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-          <option value="8">8</option>
-        </select>
-      </div>
-      <div class="ctl">
-        <label for="origin">Origin</label>
-        <select id="origin">
-          <option value="1" selected>USA</option>
-          <option value="2">Europe</option>
-          <option value="3">Japan</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="result">
-      <div class="label">Predicted fuel efficiency</div>
-      <div class="big"><span id="predText">loading...</span></div>
-      <div class="rng">Approximate range: <span id="rangeText">loading...</span></div>
-      <div class="scale"><div class="span" id="spanbar"></div><div class="dot" id="dot"></div></div>
-      <div class="scalelab"><span>5 mpg</span><span>50 mpg</span></div>
-    </div>
-
-    <div class="note">This is approximate. The range comes from cross-validation errors: for about 80% of cars the true mpg fell inside it (81% of the 80 test cars). It only applies to cars like those in the 1970 to 1982 data.</div>
-  </div>
-
-  <script>
-    // model will hold the contents of model.json (like a Python dict)
-    var model = null;
-
-    fetch("model.json")
-      .then(function (response) { return response.json(); })
-      .then(function (data) { model = data; update(); });
-
-    // read one input by its id and turn it into a number
-    function getValue(id) {
-      return Number(document.getElementById(id).value);
-    }
-
-    // position (0 to 100 percent) of an mpg value on the 5 to 50 mpg bar
-    function pos(v) {
-      return Math.max(0, Math.min(100, (v - 5) / 45 * 100));
-    }
-
-    function update() {
-      // show the number next to each slider
-      ["weight", "horsepower", "model_year", "displacement", "acceleration"].forEach(function (id) {
-        document.getElementById(id + "Value").textContent = document.getElementById(id).value;
-      });
-
-      if (model === null) { return; }   // model.json has not loaded yet
-
-      var x = {
-        cylinders: getValue("cylinders"),
-        displacement: getValue("displacement"),
-        horsepower: getValue("horsepower"),
-        weight: getValue("weight"),
-        acceleration: getValue("acceleration"),
-        model_year: getValue("model_year")
-      };
-
-      // log(mpg) = intercept + sum of coefficient * standardized input
-      var s = model.intercept;
-      for (var i = 0; i < model.num_cols.length; i++) {
-        var name = model.num_cols[i];
-        var z = (x[name] - model.means[i]) / model.scales[i];   // standardize
-        s = s + model.coefs[i] * z;
-      }
-
-      // origin: add the coefficient of the chosen origin (one-hot encoding)
-      var origin = getValue("origin");
-      for (var j = 0; j < model.origin_categories.length; j++) {
-        if (model.origin_categories[j] === origin) {
-          s = s + model.coefs[model.num_cols.length + j];
+    /* predictor */
+    #predictor { background: linear-gradient(180deg, #f8fafc, #eef2ff); border: 1px solid #c7d2fe; border-radius: 18px; padding: 22px; margin-top: 14px; }
+    .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+    .presets button { font-family: inherit; font-size: 0.85rem; font-weight: 600; padding: 8px 14px; border: 1px solid #c7d2fe; background: #ffffff; color: #3730a3; border-radius: 20px; cursor: pointer; }
+    .presets button:hover { background: var(--accent); color: #ffffff; border-color: var(--accent); }
+    .controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px 28px; margin-top: 10px; }
+    .ctl label { display: flex; justify-content: space-between; font-weight: 600; font-size: 0.88rem; margin-bottom: 4px; color: #334155; }
+    .ctl .val { color: var(--accent); font-variant-numeric: tabular-nums; }
+    .ctl input[type=range] { width: 100%; accent-color: var(--accent); }
+    .ctl select { width: 100%; font-family: inherit; padding: 8px; font-size: 0.95rem; border: 1px solid #c7d2fe; border-radius: 10px; background: #ffffff; }
+    .result { text-align: center; background: #ffffff; border: 1px solid
