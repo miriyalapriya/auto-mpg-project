@@ -219,7 +219,15 @@
         <tr><td>Gradient boosting</td><td>1.762</td><td>2.345</td><td>0.898</td></tr>
       </table>
     </div>
-
+        <h3>Test error at a glance (average miss in mpg, shorter is better)</h3>
+    <div style="margin: 10px 0 14px;">
+      <div style="display:flex;align-items:center;gap:10px;margin:6px 0;font-size:0.9rem;"><span style="width:150px;">Baseline (mean)</span><div style="flex:1;background:#e2e8f0;border-radius:6px;height:16px;"><div style="width:99.3%;background:#94a3b8;height:16px;border-radius:6px;"></div></div><span style="width:50px;text-align:right;">5.96</span></div>
+      <div style="display:flex;align-items:center;gap:10px;margin:6px 0;font-size:0.9rem;"><span style="width:150px;">Linear regression</span><div style="flex:1;background:#e2e8f0;border-radius:6px;height:16px;"><div style="width:38.1%;background:#94a3b8;height:16px;border-radius:6px;"></div></div><span style="width:50px;text-align:right;">2.29</span></div>
+      <div style="display:flex;align-items:center;gap:10px;margin:6px 0;font-size:0.9rem;font-weight:700;"><span style="width:150px;">Ridge on log(mpg)</span><div style="flex:1;background:#e2e8f0;border-radius:6px;height:16px;"><div style="width:29.5%;background:#4f46e5;height:16px;border-radius:6px;"></div></div><span style="width:50px;text-align:right;">1.77</span></div>
+      <div style="display:flex;align-items:center;gap:10px;margin:6px 0;font-size:0.9rem;"><span style="width:150px;">Random forest</span><div style="flex:1;background:#e2e8f0;border-radius:6px;height:16px;"><div style="width:26.1%;background:#94a3b8;height:16px;border-radius:6px;"></div></div><span style="width:50px;text-align:right;">1.57</span></div>
+      <div style="display:flex;align-items:center;gap:10px;margin:6px 0;font-size:0.9rem;"><span style="width:150px;">Gradient boosting</span><div style="flex:1;background:#e2e8f0;border-radius:6px;height:16px;"><div style="width:29.4%;background:#94a3b8;height:16px;border-radius:6px;"></div></div><span style="width:50px;text-align:right;">1.76</span></div>
+      <p style="font-size:0.85rem;color:#64748b;margin:6px 0 0;">Test MAE on the 80 held-out cars. The purple bar is my final model.</p>
+    </div>
     <p>My final model misses by 1.77 mpg on average, compared with 5.96 mpg for the baseline. Taking the log of mpg was the most useful change: it lowered the cross-validation error from 2.67 to 2.27.</p>
     <p>The random forest is a bit more accurate than my model (test MAE 1.57), and gradient boosting did best in cross-validation. I still chose ridge on log(mpg) because it can be explained from its coefficients and runs directly in this web page. The test set has only 80 cars, so the small gaps between the better models should not be over-read.</p>
   </section>
